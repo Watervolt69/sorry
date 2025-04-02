@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorry I'm Late Babe</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>💘</text></svg>">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff6b9d;
+            --secondary: #6c63ff;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff0f5;
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+        }
+        
+        header {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #ff6b9d, #ff9fb4);
+            color: white;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 20px rgba(255, 107, 157, 0.3);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin: 0.5rem 0 0;
+        }
+        
+        .floating-hearts {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        
+        .heart {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .mistake-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        
+        .mistake-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            flex: 1;
+            min-width: 200px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            border: 2px solid transparent;
+        }
+        
+        .mistake-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .mistake-card.selected {
+            border-color: var(--primary);
+            background-color: rgba(255, 107, 157, 0.05);
+        }
+        
+        .mistake-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+        
+        .mistake-card:hover .mistake-icon {
+            transform: scale(1.2);
+        }
+        
+        .apology-generator {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+        
+        .apology-generator.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .apology-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            justify-content: center;
+        }
+        
+        .tone-option {
+            background: var(--light);
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .tone-option:hover {
+            background: rgba(255, 107, 157, 0.1);
+        }
+        
+        .tone-option.selected {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .apology-result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #fff0f7;
+            border-radius: 12px;
+            position: relative;
+            min-height: 100px;
+            text-align: left;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .result-content {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--transition);
+        }
+        
+        .result-content.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+        
+        .loading-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            margin: 0 6px;
+            animation: loading 1.4s infinite ease-in-out both;
+        }
+        
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        .copy-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .copy-button:hover {
+            background: #ff4785;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+        }
+        
+        .copy-button:active {
+            transform: translateY(0);
+        }
+        
+        .send-button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            margin-left: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .send-button:hover {
+            background: #5a52d5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+        }
+        
+        .send-button:active {
+            transform: translateY(0);
+        }
+        
+        .promise-checkbox {
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .promise-checkbox input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .promise-checkbox label {
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .copy-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 100;
+        }
+        
+        .copy-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 2rem;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .footer-heart {
+            color: var(--primary);
+            animation: heartbeat 1.5s infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes loading {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes heartbeat {
+            0% {
+                transform: scale(1);
+            }
+            5% {
+                transform: scale(1.25);
+            }
+            10% {
+                transform: scale(1);
+            }
+            15% {
+                transform: scale(1.25);
+            }
+            20% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .mistake-card {
+                min-width: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sorry I'm Late</h1>
+        <p class="tagline">Because you deserve better response times</p>
+        <div class="floating-hearts" id="floating-hearts"></div>
+    </header>
+    
+    <div class="container">
+        <div class="mistake-selector">
+            <div class="mistake-card" data-mistake="late-text">
+                <i class="mistake-icon fas fa-clock"></i>
+                <h3>Late Texts</h3>
+                <p>For taking hours or days to reply</p>
+            </div>
+            <div class="mistake-card" data-mistake="disappearing">
+                <i class="mistake-icon fas fa-ghost"></i>
+                <h3>Disappeared</h3>
+                <p>For vanishing without explanation</p>
+            </div>
+            <div class="mistake-card" data-mistake="both">
+                <i class="mistake-icon fas fa-exclamation-circle"></i>
+                <h3>Did Both</h3>
+                <p>For the double whammy of mistakes</p>
+            </div>
+        </div>
+        
+        <div class="apology-generator" id="apology-generator">
+            <h2>Create Your Special Apology</h2>
+            <p>How do you want to say it?</p>
+            
+            <div class="apology-options">
+                <button class="tone-option" data-tone="sweet">
+                    <i class="fas fa-heart"></i> Sweet
+                </button>
+                <button class="tone-option" data-tone="sincere">
+                    <i class="fas fa-hand-holding-heart"></i> Sincere
+                </button>
+                <button class="tone-option" data-tone="romantic">
+                    <i class="fas fa-roses"></i> Romantic
+                </button>
+                <button class="tone-option" data-tone="funny">
+                    <i class="fas fa-laugh"></i> Funny
+                </button>
+            </div>
+            
+            <div class="promise-checkbox">
+                <input type="checkbox" id="promise-checkbox">
+                <label for="promise-checkbox">I promise to do better in the future</label>
+            </div>
+            
+            <div class="apology-result" id="apology-result">
+                <div class="result-content" id="result-content">
+                    <p>Your heartfelt apology will appear here...</p>
+                </div>
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+            </div>
+            
+            <div>
+                <button class="copy-button" id="copy-button">
+                    <i class="fas fa-copy"></i> Copy Apology
+                </button>
+                <button class="send-button" id="send-button">
+                    <i class="fas fa-paper-plane"></i> Send Now
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="copy-notification" id="copy-notification">
+        Copied to clipboard!
+    </div>
+    
+    <footer>
+        Made with <span class="footer-heart">❤</span> to make things right
+    </footer>
+    
+    <script>
+        // Floating hearts animation
+        const floatingHearts = document.getElementById('floating-hearts');
+        const hearts = ['❤️', '💕', '💘', '💖', '💗', '💓', '💞', '💝'];
+        
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+            heart.style.left = `${Math.random() * 100}%`;
+            heart.style.animationDuration = `${5 + Math.random() * 5}s`;
+            heart.style.animationDelay = `${Math.random() * 5}s`;
+            floatingHearts.appendChild(heart);
+            
+            // Remove heart after animation
+            setTimeout(() => {
+                floatingHearts.removeChild(heart);
+            }, 10000);
+        }
+        
+        // Create hearts periodically
+        setInterval(createFloatingHeart, 800);
+        
+        // Initial hearts
+        for (let i = 0; i < 6; i++) {
+            createFloatingHeart();
+        }
+        
+        // Interaction logic
+        const mistakeCards = document.querySelectorAll('.mistake-card');
+        const toneOptions = document.querySelectorAll('.tone-option');
+        const apologyGenerator = document.getElementById('apology-generator');
+        const resultContent = document.getElementById('result-content');
+        const loading = document.getElementById('loading');
+        const copyButton = document.getElementById('copy-button');
+        const sendButton = document.getElementById('send-button');
+        const copyNotification = document.getElementById('copy-notification');
+        const promiseCheckbox = document.getElementById('promise-checkbox');
+        
+        let selectedMistake = null;
+        let selectedTone = null;
+        let promiseMade = false;
+        
+        // Mistake selection
+        mistakeCards.forEach(card => {
+            card.addEventListener('click', () => {
+                mistakeCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedMistake = card.dataset.mistake;
+                apologyGenerator.classList.add('active');
+                
+                // Reset tone selection when mistake changes
+                toneOptions.forEach(option => option.classList.remove('selected'));
+                selectedTone = null;
+                
+                // Reset apology text
+                resultContent.innerHTML = '<p>Your heartfelt apology will appear here...</p>';
+                resultContent.classList.remove('active');
+            });
+        });
+        
+        // Tone selection
+        toneOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                toneOptions.forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedTone = option.dataset.tone;
+                
+                if (selectedMistake && selectedTone) {
+                    generateApology(selectedMistake, selectedTone, promiseCheckbox.checked);
+                }
+            });
+        });
+        
+        // Promise checkbox
+        promiseCheckbox.addEventListener('change', () => {
+            promiseMade = promiseCheckbox.checked;
+            if (selectedMistake && selectedTone) {
+                generateApology(selectedMistake, selectedTone, promiseMade);
+            }
+        });
+        
+        // Generate apology
+        function generateApology(mistake, tone, promise) {
+            // Show loading
+            resultContent.classList.remove('active');
+            loading.style.display = 'flex';
+            
+            // Simulate loading time
+            setTimeout(() => {
+                loading.style.display = 'none';
+                resultContent.innerHTML = getApologyText(mistake, tone, promise);
+                resultContent.classList.add('active');
+            }, 1200);
+        }
+        
+        // Copy functionality
+        copyButton.addEventListener('click', () => {
+            const apologyText = resultContent.textContent;
+            
+            if (apologyText && apologyText !== 'Your heartfelt apology will appear here...') {
+                navigator.clipboard.writeText(apologyText).then(() => {
+                    copyNotification.classList.add('show');
+                    
+                    setTimeout(() => {
+                        copyNotification.classList.remove('show');
+                    }, 2000);
+                });
+            }
+        });
+        
+        // Send button functionality (simulated)
+        sendButton.addEventListener('click', () => {
+            const apologyText = resultContent.textContent;
+            
+            if (apologyText && apologyText !== 'Your heartfelt apology will appear here...') {
+                // Simulated sending effect
+                sendButton.innerHTML = '<i class="fas fa-check"></i> Sent!';
+                sendButton.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i> Send Now';
+                    sendButton.style.background = '';
+                }, 3000);
+            }
+        });
+        
+        // Apology text database
+        function getApologyText(mistake, tone, promise) {
+            const apologies = {
+                'late-text': {
+                    sweet: "Hey , I'm so sorry for taking so long to text you back. I know waiting for my replies can make you feel ignored, and you deserve better than that. You're always on my mind even when I'm slow to respond. ❤️",
+                    sincere: "I need to apologize for my late responses. It's not fair to you when I take hours or even days to text back. I know it can feel like I'm not prioritizing our communication, and that's the last thing I want you to think. I'm truly sorry.",
+                    romantic: "My beautiful friend, I'm sorry my fingers have been so slow to type what my heart always feels. No text delay could ever measure the constant thoughts I have of you. I cherish our conversations and promise to match my response time to the intensity of my feelings for you - immediate and unwavering.",
+                    funny: "BREAKING NEWS: World's Worst Texter Apologizes to World's Most Patient Friend! In my defense, sometimes I stare at your message for so long thinking about how lucky I am that I forget to actually reply. Sorry for being slower than internet explorer on a 90s computer! 😅"
+                },
+                'disappearing': {
+                    sweet: "I'm so sorry for disappearing on you like that. I know it's not a good feeling when someone you care about suddenly goes quiet. You deserve consistent communication and attention. Thank you for being patient with me when I mess up like this. ❤️",
+                    sincere: "I want to sincerely apologize for disappearing without explanation. That was inconsiderate and unfair to you. I understand how it might have made you worry or feel unimportant, which couldn't be further from the truth. I'm sorry for causing any hurt.",
+                    romantic: "My heart aches knowing I've been absent from our conversations. Like a star that temporarily dims but never stops shining, my affection for you remained even in my silence. I'm truly sorry for every moment you waited for a word from me that didn't come.",
+                    funny: "So... you know how people joke about 'ghosting'? Turns out I accidentally auditioned for the role without meaning to! Not my finest performance and definitely not getting any awards for it. Sorry for pulling the disappearing act - I promise I'm not actually trying to audition for Houdini 2.0! 👻"
+                },
+                'both': {
+                    sweet: "I'm really sorry for both taking ages to reply AND disappearing on you. I know these communication fails make things harder than they need to be, and you deserve someone who's consistent and present. Thank you for being understanding even when I don't deserve it. ❤️",
+                    sincere: "I need to apologize for my pattern of late responses and disappearing acts. These communication issues are completely on me, and I understand how frustrating and hurtful they can be. You deserve reliability and respect in how we communicate, and I've fallen short of that. I'm truly sorry.",
+                    romantic: "My darling, I've committed the dual crime of delayed replies and vanishing acts - the greatest injustice to the beautiful connection we share. Each notification from you brings sunshine to my day, making my failure to respond promptly all the more unforgivable. Your patience with me is yet another reason my heart belongs entirely to you.",
+                    funny: "WANTED: Me, for crimes against texting etiquette. Charges include extreme delayed responses, mysterious disappearances, and making the world's most amazing girlfriend wait. My only defense is temporary thumbs paralysis and occasional phone amnesia. Punishment: whatever you decide, but I'm hoping for community service in the form of extra cuddles! 🚨"
+                }
+            };
+            
+            let text = apologies[mistake][tone];
+            
+            // Add promise if checked
+            if (promise) {
+                const promises = {
+                    'late-text': "I promise to be more responsive going forward. No more making you wait for replies!",
+                    'disappearing': "I promise not to disappear like that again. I'll always let you know if I need space or time.",
+                    'both': "I promise to change both these habits. You'll see consistent, timely responses from me from now on."
+                };
+                
+                text += " " + promises[mistake];
+            }
+            
+            return text;
+        }
+    </script>
+</body>
+</html>
